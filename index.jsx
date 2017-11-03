@@ -39,6 +39,8 @@ function defaultGetHeight (element) {
  * @param {string} [options.className] Control the class name set on the wrapper `<div>`
  * @param {boolean} [options.elementResize=false] Set true to watch the wrapper `div` for changes in
  * size which are not a result of window resizing - e.g. changes to the flexbox and other layout.
+ * @param {boolean} {options.alwaysRender=false} Set to true to render the managed component even when
+ * the container has no height or width
  * @return {function}                   A higher-order component that can be
  * used to enhance a react component `Dimensions()(MyComponent)`
  *
@@ -82,7 +84,8 @@ module.exports = function Dimensions ({
     getWidth = defaultGetWidth,
     containerStyle = defaultContainerStyle,
     className = null,
-    elementResize = false
+    elementResize = false,
+    alwaysRender = false,
   } = {}) {
   return (ComposedComponent) => {
     return class DimensionsHOC extends React.Component {
@@ -152,18 +155,21 @@ module.exports = function Dimensions ({
 
       render () {
         const {containerWidth, containerHeight} = this.state
-        if (!containerWidth && !containerHeight) {
+        const renderComponent = containerWidth || containerHeight || alwaysRender;
+
+        if (!renderComponent) {
           console.warn('Wrapper div has no height or width, try overriding style with `containerStyle` option')
         }
         return (
           <div className={className} style={containerStyle} ref='container'>
-            {(containerWidth || containerHeight) &&
+            {renderComponent ?
               <ComposedComponent
                 {...this.state}
                 {...this.props}
                 updateDimensions={this.updateDimensions}
                 ref='wrappedInstance'
               />
+              : "The component was not rendered because height or width is zero"
             }
           </div>
         )
