@@ -1,5 +1,7 @@
+const _debounce = require('lodash.debounce')
 const React = require('react')
 const onElementResize = require('element-resize-event')
+const unbind = require('element-resize-event').unbind
 
 const defaultContainerStyle = {
   width: '100%',
@@ -8,12 +10,8 @@ const defaultContainerStyle = {
   border: 0
 }
 
-function defaultGetWidth (element) {
-  return element.clientWidth
-}
-
-function defaultGetHeight (element) {
-  return element.clientHeight
+function defaultGetDimensions (element) {
+  return [element.clientWidth, element.clientHeight]
 }
 
 /**
@@ -32,6 +30,12 @@ function defaultGetHeight (element) {
  * height, where element is the wrapper div. Defaults to `(element) => element.clientHeight`
  * @param {function} [options.getWidth]  A function that is passed an element and returns element
  * width, where element is the wrapper div. Defaults to `(element) => element.clientWidth`
+ * @param {number} [options.debounce] Optionally debounce the `onResize` callback function by
+ * supplying the delay time in milliseconds. This will prevent excessive dimension
+ * updates. See
+ * https://lodash.com/docs#debounce for more information. Defaults to `0`, which disables debouncing.
+ * @param {object} [options.debounceOpts] Options to pass to the debounce function. See
+ * https://lodash.com/docs#debounce for all available options. Defaults to `{}`.
  * @param {object} [options.containerStyle] A style object for the `<div>` that will wrap your component.
  * The dimensions of this `div` are what are passed as props to your component. The default style is
  * `{ width: '100%', height: '100%', padding: 0, border: 0 }` which will cause the `div` to fill its
@@ -79,13 +83,13 @@ function defaultGetHeight (element) {
  * module.exports = Dimensions()(MyComponent) // Enhanced component
  *
  */
-module.exports = function Dimensions ({
-    getHeight = defaultGetHeight,
-    getWidth = defaultGetWidth,
-    containerStyle = defaultContainerStyle,
-    className = null,
+export default function Dimensions ({
+    getDimensions = defaultGetDimensions,
+    debounce = 0,
+    debounceOpts = {},
     elementResize = false,
     alwaysRender = false,
+    containerStyle = defaultContainerStyle
   } = {}) {
   return (ComposedComponent) => {
     return class DimensionsHOC extends React.Component {
@@ -95,16 +99,23 @@ module.exports = function Dimensions ({
 
       // Using arrow functions and ES7 Class properties to autobind
       // http://babeljs.io/blog/2015/06/07/react-on-es6-plus/#arrow-functions
-      updateDimensions = () => {
-        const container = this.refs.container
-        const containerWidth = getWidth(container)
-        const containerHeight = getHeight(container)
 
-        if (containerWidth !== this.state.containerWidth ||
-            containerHeight !== this.state.containerHeight) {
-          this.setState({containerWidth, containerHeight})
+      // Immediate updateDimensions callback with no debounce
+      updateDimensionsImmediate = () => {
+        const dimensions = getDimensions(this._parent)
+
+        if (dimensions[0] !== this.state.containerWidth ||
+            dimensions[1] !== this.state.containerHeight) {
+          this.setState({
+            containerWidth: dimensions[0],
+            containerHeight: dimensions[1]
+          })
         }
       }
+
+      // Optionally-debounced updateDimensions callback
+      updateDimensions = debounce === 0 ? this.updateDimensionsImmediate
+        : _debounce(this.updateDimensionsImmediate, debounce, debounceOpts)
 
       onResize = () => {
         if (this.rqf) return
@@ -124,22 +135,28 @@ module.exports = function Dimensions ({
       }
 
       componentDidMount () {
-        if (!this.refs.container) {
-          throw new Error('Cannot find container div')
+        if (!this.refs.wrapper) {
+          throw new Error('Cannot find wrapper div')
         }
-        this.updateDimensions()
+        this._parent = this.refs.wrapper.parentNode
+        this.updateDimensionsImmediate()
         if (elementResize) {
           // Experimental: `element-resize-event` fires when an element resizes.
           // It attaches its own window resize listener and also uses
           // requestAnimationFrame, so we can just call `this.updateDimensions`.
-          onElementResize(this.refs.container, this.updateDimensions)
+          onElementResize(this._parent, this.updateDimensions)
         } else {
           this.getWindow().addEventListener('resize', this.onResize, false)
         }
       }
 
       componentWillUnmount () {
-        this.getWindow().removeEventListener('resize', this.onResize)
+        this._parent = this.refs.wrapper.parentNode
+        if (elementResize) {
+          unbind(this._parent)
+        } else {
+          this.getWindow().removeEventListener('resize', this.onResize)
+        }
       }
 
       /**
@@ -150,26 +167,27 @@ module.exports = function Dimensions ({
        * @return {object} The rendered React component
        **/
       getWrappedInstance () {
-        this.refs.wrappedInstance
+        return this.refs.wrappedInstance
       }
 
       render () {
         const {containerWidth, containerHeight} = this.state
-        const renderComponent = containerWidth || containerHeight || alwaysRender;
+        const renderComponent = containerWidth || containerHeight || alwaysRender
 
         if (!renderComponent) {
           console.warn('Wrapper div has no height or width, try overriding style with `containerStyle` option')
         }
+
         return (
-          <div className={className} style={containerStyle} ref='container'>
-            {renderComponent ?
-              <ComposedComponent
+          <div style={containerStyle} ref='wrapper'>
+            {renderComponent
+              ? <ComposedComponent
                 {...this.state}
                 {...this.props}
                 updateDimensions={this.updateDimensions}
                 ref='wrappedInstance'
-              />
-              : "The component was not rendered because height or width is zero"
+               />
+              : null
             }
           </div>
         )

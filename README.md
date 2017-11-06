@@ -2,11 +2,11 @@
 
 React [higher-order component](https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775) to get the dimensions of a wrapper element and pass them as properties to the child element.
 
-v^1.0.0 is for React v0.14 and above. Use ^0.1.0 for React v0.13
+**v2.0.0-alpha1:** Includes several breaking changes, most importantly changing the way dimensions are calculated. The parent container is now used for width calculations, and the wrapper div inside this component is ignored. Hopefully this will solve the multiple styling issues users have had, but it will break layout in apps using v1.2.0
 
 ## Why? How?
 
-Some React components require a width to be set in pixels, and cannot be set to `100%`. This is a challenge for responsive design. This component creates a wrapper `<div>` and sets the width and height to `100%`, and then passes the dimensions of this `div`  to your component.
+Some React components require a width to be set in pixels, and cannot be set to `100%`. This is a challenge for responsive design. This component measures the size of the parent node, and then passes these dimensions to your component.
 
 ## Installation
 
@@ -14,6 +14,12 @@ Requires [nodejs](http://nodejs.org/).
 
 ```sh
 $ npm install react-dimensions
+```
+
+To install the pre-release version:
+
+```sh
+$ npm install react-dimensions@next
 ```
 
 ## API
@@ -37,13 +43,19 @@ or as an [ES7 class decorator](https://github.com/wycats/javascript-decorators)
         height, where element is the wrapper div. Defaults to `(element) => element.clientHeight`
     -   `options.getWidth` **[function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)=** A function that is passed an element and returns element
         width, where element is the wrapper div. Defaults to `(element) => element.clientWidth`
+    -   `options.debounce` **\[[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)]** Optionally debounce the `onResize` callback function by
+        supplying the delay time in milliseconds. This will prevent excessive dimension
+        updates. See <https://lodash.com/docs#debounce> for more information. Defaults to `0`, which disables debouncing.
+    -   `options.debounceOpts` **\[[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)]** Options to pass to the debounce function. See
+        <https://lodash.com/docs#debounce> for all available options. Defaults to `{}`.
     -   `options.containerStyle` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)=** A style object for the `<div>` that will wrap your component.
-        The dimensions of this `div` are what are passed as props to your component. The default style is
-        `{ width: '100%', height: '100%', padding: 0, border: 0 }` which will cause the `div` to fill its
-        parent in most cases. If you are using a flexbox layout you will want to change this default style.
+        If you are using a flexbox layout you will need to style this `div` rather than your wrapped component (because flexbox only works with direct children). The default style is
+        `{ margin: 0, padding: 0, border: 0 }`.
     -   `options.className` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)=** Control the class name set on the wrapper `<div>`
     -   `options.elementResize` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)=** Set true to watch the wrapper `div` for changes in
         size which are not a result of window resizing - e.g. changes to the flexbox and other layout. (optional, default `false`)
+    -   `options.alwaysRender` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)=** Set true to render the child componet even when the 
+        a dimension is zero. (optional, default = `false`)
 
 **Examples**
 

@@ -2,16 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-## [1.3.1] - 2017-10-24
-### Added
-- Added peer dependency for React 16
-
-## [1.3.0] - 2016-07-08
+## [2.0.0-alpha1] - 2016-08-12
 ### Added
 - Added a CHANGELOG.md
-- Add option `className` for setting an optional class on the wrapper `<div>` ([#32](https://github.com/digidem/react-dimensions/pull/32))
+- **Breaking:** Measure the parent node rather than the wrapper. You will need to wrap this component in a `<div>` and style that.
+- **Breaking:** Removed `containerStyle` and `containerClass` options - the wrapper `<div>` is no longer used for calculating dimensions.
+- **Breaking:** Removed options `getWidth` and `getHeight`, replaced with `getDimensions`. This will allow replacing the current dimensions calculation with a single call to `getBoundingClientRect()`, rather than two. Currently we are still using `element.clientWidth` and `element.clientHeight` for dimension calculation.
 
 ## [1.2.0] - 2016-05-26
 ### Added
@@ -36,9 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Now works in popup windows and iframes with a different `window` context (#22)
 
 
-[Unreleased]: https://github.com/digidem/react-dimensions/compare/v1.3.1...HEAD
-[1.3.1]: https://github.com/digidem/react-dimensions/compare/v1.3.0...v1.3.1
-[1.3.0]: https://github.com/digidem/react-dimensions/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/digidem/react-dimensions/compare/v1.1.1...v1.2.0
-[1.1.1]: https://github.com/digidem/react-dimensions/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/digidem/react-dimensions/compare/v1.0.2...v1.1.0
+[2.0.0-alpha1]: https://github.com/digidem/react-dimensions/compare/v1.2.0...v2.0.0-alpha1
+[1.2.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.1.1...v1.2.0
+[1.1.1]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.2...v1.1.0
