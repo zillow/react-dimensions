@@ -88,7 +88,7 @@ export default function Dimensions ({
     debounce = 0,
     debounceOpts = {},
     elementResize = false,
-    containerStyle = defaultContainerStyle
+    containerStyle = defaultContainerStyle,
     alwaysRender = false
   } = {}) {
   return (ComposedComponent) => {
