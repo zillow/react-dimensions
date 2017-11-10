@@ -89,6 +89,7 @@ export default function Dimensions ({
     debounceOpts = {},
     elementResize = false,
     containerStyle = defaultContainerStyle,
+    className = null,
     alwaysRender = false
   } = {}) {
   return (ComposedComponent) => {
@@ -179,7 +180,7 @@ export default function Dimensions ({
         }
 
         return (
-          <div style={containerStyle} ref='wrapper'>
+          <div className={className} style={containerStyle} ref='wrapper'>
             {renderComponent
               ? <ComposedComponent
                 {...this.state}
