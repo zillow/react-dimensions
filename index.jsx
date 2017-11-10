@@ -173,7 +173,7 @@ export default function Dimensions ({
 
       render () {
         const {containerWidth, containerHeight} = this.state
-        const renderComponent = this._parent && containerWidth && containerHeight || alwaysRender;
+        const renderComponent = this._parent && containerWidth && containerHeight || alwaysRender
 
         if (!renderComponent) {
           console.warn('Wrapper div has no height or width, try overriding style with `containerStyle` option')
