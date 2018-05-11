@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0-alpha.0] 2017-11-07
+### Added
+- `alwaysRender` option for cases in which the component should be rendered to the DOM even if it has no space to display.
+
 ## [2.0.0-alpha1] - 2016-08-12
 ### Added
 - Added a CHANGELOG.md
