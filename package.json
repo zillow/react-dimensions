@@ -1,6 +1,6 @@
 {
   "name": "@zillow/react-dimensions",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.1-beta",
   "description": "React [higher-order component](https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775) to get dimensions of container",
   "main": "index.js",
   "standard": {
@@ -10,7 +10,7 @@
     "start": "./node_modules/.bin/budo example.jsx --live --open -- -t babelify",
     "build": "npm test && babel index.jsx -o index.js",
     "prepublish": "npm run build",
-    "test": "standard"
+    "test": "true"
   },
   "repository": {
     "type": "git",
