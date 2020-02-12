@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digidem/react-dimensions.git"
+    "url": "git+https://github.com/zillow/react-dimensions.git"
   },
   "files": [
     "index.js"
@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/digidem/react-dimensions/issues"
   },
-  "homepage": "https://github.com/digidem/react-dimensions#readme",
+  "homepage": "https://github.com/zillow/react-dimensions",
   "devDependencies": {
     "babel-cli": "^6.7.7",
     "babel-eslint": "^6.0.3",
