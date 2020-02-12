@@ -176,9 +176,8 @@ export default function Dimensions ({
         const {containerWidth, containerHeight} = this.state
         const renderComponent = this._parent && containerWidth && containerHeight || alwaysRender
 
-        if (!renderComponent) {
-          console.warn('Wrapper div has no height or width, try overriding style with `containerStyle` option')
-        }
+        // renderComponent will be undefined if it has no width or height (during server side render)
+        // Original forked repo does a console.warn() here, but it's log spam for Zillow's use so it's been removed.
 
         return (
           <div className={className} style={containerStyle} ref='wrapper'>
